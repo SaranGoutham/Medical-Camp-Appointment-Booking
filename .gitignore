@@ -53,3 +53,5 @@ Thumbs.db
 *.env.*.backup
 *.localhistory
 *.archive
+
+Project_Readme.md
