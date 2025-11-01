@@ -1,0 +1,16 @@
+{
+  "files": [],
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@app/*": ["frontend/src/app/*"],
+      "@providers/*": ["frontend/src/app/providers/*"],
+      "@features/*": ["frontend/src/features/*"],
+      "@shared/*": ["frontend/src/shared/*"],
+      "@assets/*": ["frontend/src/assets/*"]
+    }
+  },
+  "references": [
+    { "path": "frontend" }
+  ]
+}
