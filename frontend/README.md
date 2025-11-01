@@ -1,30 +1,56 @@
 # Medical Camp Frontend
 
-React + Vite + TypeScript frontend for the Medical-Camp project.
+React + Vite + TypeScript frontend that connects directly to Supabase for authentication, profiles, and appointment data. There is no custom Express backend anymore; all data access happens through the Supabase JavaScript client with Row Level Security keeping things safe.
+
+## Project Structure
+
+```
+src/
+  app/                # Providers, layouts, route composition
+  features/
+    landing/          # Marketing/landing experience
+    auth/             # Login & signup flows
+    user/             # Patient dashboard
+    admin/            # Admin dashboard
+    profile/          # Profile management
+  shared/             # Light shared utilities/components
+  assets/             # Static assets consumed by features
+```
+
+Import aliases keep boundaries clear and avoid deep relatives:
+
+| Alias         | Resolves to         | Purpose                              |
+|---------------|---------------------|--------------------------------------|
+| `@app/*`      | `src/app/*`         | Application shell, providers, router |
+| `@features/*` | `src/features/*`    | Feature entry points                 |
+| `@shared/*`   | `src/shared/*`      | Shared utilities/components          |
+| `@assets/*`   | `src/assets/*`      | Static assets                        |
+| `@providers/*`| `src/app/providers/*`| Auth context + Supabase client       |
 
 ## Install & Run
 
-- cd `frontend`
-- `cp .env.example .env` and set:
-  - `VITE_SUPABASE_URL`
-  - `VITE_SUPABASE_ANON_KEY`
-  - `VITE_API_URL` (default `http://localhost:5000/api`)
-- `npm install`
-- `npm run dev`
+```bash
+cd frontend
+cp .env.example .env  # supply Supabase project keys
+npm install
+npm run dev
+```
 
-Backend must allow CORS from `http://localhost:5173` (your backend already defaults to this).
+Required env vars:
+- `VITE_SUPABASE_URL`
+- `VITE_SUPABASE_ANON_KEY`
 
 ## Pages
 
-- Get Started: Overview and quick links.
-- Login: Supabase email/password auth.
-- Sign Up: Create account (confirmation depends on Supabase settings).
-- User Home: Calls `GET /api/appointments/my` with Supabase JWT.
-- Admin Home: Calls `GET /api/appointments` (admin-only).
+- Landing (`/`): Overview and quick links.
+- Login (`/login`): Supabase email/password auth.
+- Sign Up (`/signup`): Creates Supabase auth user and optional profile row.
+- User Dashboard (`/user`): Reads the current user’s appointments directly from Supabase.
+- Admin Dashboard (`/admin`): Loads all appointments and user list when the signed-in user has `role = 'admin'`.
+- Profile (`/profile` anchor): Displays profile information from `public.users`.
 
 ## Notes
 
-- The frontend uses Supabase auth; the backend validates the JWT via `supabase.auth.getUser()`.
-- Authorization (admin vs user) is enforced by the backend; the frontend does not hard-enforce roles.
-- To make an account admin, update the `public.users.role` field for that user in your database.
-
+- Ensure Supabase Row Level Security allows patients to read their own appointments and admins to read all records.
+- If you track additional metadata on signup, consider adding a database trigger or Edge Function to populate `public.users` automatically.
+- Adjust `frontend/src/app/providers/AuthProvider.tsx` if you change table shapes or introduce new roles.
